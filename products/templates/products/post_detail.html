@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>글 상세 페이지</h2>
+<p>제목: {{ product.title }}</p>
+{% if product.image %}
+{% comment %} alt는 이미지 불러오기 실패할때 띄우는 속성값 {% endcomment %}
+<img src="{{ product.image.url }}" alt="{{ product.image }}" width = "200">
+{% endif %}
+
+<form action="{% url 'products:like' product.pk %}" method="POST">
+
+{% csrf_token %}
+{% if request.user in product.like_users.all %}
+<button type='submit' class='btn btn-link text-danger'><i class="fa-solid fa-heart"></i></button>
+{% else %}
+<button type='submit' class='btn btn-link text-danger'><i class="fa-regular fa-heart"></i></button>
+{% endif %}
+
+<p>찜한 수: {{ product.like_count }}</p>
+<p>조회수: {{ product.n_hit.count}}</p>
+
+
+</form>
+<p>작성자: <a href="{% url 'user:profile' product.author%}">{{product.author.username }}</a></p>  
+<p>금액: {{product.price}}</p>
+<p>내용: {{ product.content }}</p>      
+<p>작성일시: {{ product.created_at }}</p>
+<p>수정일시: {{ product.updated_at }}</p>
+
+<a href="{% url 'products:products' %}">목록 보기</a><br>
+
+{% if user == product.author %}
+<br>
+<!-- 게시글 번호도 같이 업데이트 넘겨줌-->
+<a href="{% url 'products:update' product.pk%}">
+    <button>수정하기</button>
+</a>
+<form action="{% url 'products:delete' product.pk %}" method="POST">
+    {% csrf_token %}
+    <br>
+    <input type="submit" value="삭제">
+</form>
+{% endif %}
+{% endblock content %}
